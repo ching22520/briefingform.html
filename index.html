@@ -100,6 +100,18 @@
     font-size:12px;color:var(--grey);margin-top:10px;
     background:#FDF1E8;border-radius:6px;padding:10px 14px;
   }
+  .field.error input[type=text],.field.error textarea{
+    border-color:#D32F2F;background:#FFF5F5;
+  }
+  .field.error .radio-row label{border-color:#D32F2F;}
+  .error-msg{
+    color:#D32F2F;font-size:12px;font-weight:600;margin-top:4px;display:none;
+  }
+  .field.error .error-msg{display:block;}
+  .validate-banner{
+    display:none;background:#FFF5F5;border:2px solid #D32F2F;color:#D32F2F;
+    border-radius:8px;padding:14px 18px;margin-bottom:20px;font-size:14px;font-weight:700;
+  }
   .btn-row{display:flex;gap:12px;margin-top:8px;}
   .btn-row .btn{margin-top:0;}
   .btn.secondary{background:#fff;color:var(--orange-deep);border:2px solid var(--orange);}
@@ -120,6 +132,8 @@
     <h1>提案 Brief 表單</h1>
     <p>請盡量填寫，不確定的欄位可留空或寫「待確認」。</p>
   </header>
+
+  <div class="validate-banner" id="validate-banner">⚠️ 有必填欄位尚未完成，請往下捲動查看紅框標示的項目</div>
 
   <div class="section">
     <h2>基本資訊</h2>
@@ -318,6 +332,66 @@ document.addEventListener("DOMContentLoaded", function(){
   const d = new Date();
   document.getElementById("fill-date").value = d.getFullYear() + "/" + (d.getMonth()+1) + "/" + d.getDate();
 });
+// ===== 必填驗證 =====
+const REQUIRED_TEXT_IDS = ["client","brand","industry","product","background","past-marketing","goal","budget","deadline"];
+const REQUIRED_RADIO_NAMES = ["reqtype","ispitch","clienttype","clientrel","pitchcat"];
+
+function clearFieldError(container){
+  container.classList.remove("error");
+  const msg = container.querySelector(".error-msg");
+  if(msg) msg.remove();
+}
+function setFieldError(container, text){
+  container.classList.add("error");
+  if(!container.querySelector(".error-msg")){
+    const p = document.createElement("div");
+    p.className = "error-msg";
+    p.textContent = text;
+    container.appendChild(p);
+  }
+}
+
+function validateForm(){
+  let firstInvalid = null;
+  let ok = true;
+
+  REQUIRED_TEXT_IDS.forEach(id=>{
+    const el = document.getElementById(id);
+    if(!el) return;
+    const container = el.closest(".field");
+    if(!el.value.trim()){
+      ok = false;
+      setFieldError(container, "此欄位為必填");
+      if(!firstInvalid) firstInvalid = container;
+    } else {
+      clearFieldError(container);
+    }
+  });
+
+  REQUIRED_RADIO_NAMES.forEach(name=>{
+    const checked = document.querySelector('input[name="'+name+'"]:checked');
+    const anyRadio = document.querySelector('input[name="'+name+'"]');
+    if(!anyRadio) return;
+    const container = anyRadio.closest(".field");
+    if(!checked){
+      ok = false;
+      setFieldError(container, "請選擇一個選項");
+      if(!firstInvalid) firstInvalid = container;
+    } else {
+      clearFieldError(container);
+    }
+  });
+
+  const banner = document.getElementById("validate-banner");
+  if(ok){
+    banner.style.display = "none";
+  } else {
+    banner.style.display = "block";
+    if(firstInvalid) firstInvalid.scrollIntoView({behavior:"smooth", block:"center"});
+  }
+  return ok;
+}
+
 function val(id){ return document.getElementById(id).value.trim() || "（未填）"; }
 function valOrSkip(id){ return document.getElementById(id).value.trim(); }
 function radioVal(name){
@@ -329,6 +403,7 @@ function checkVals(name){
   return checked.length ? checked.join("、") : "（未填）";
 }
 function generateBrief(){
+  if(!validateForm()) return;
   const isPitch = radioVal("ispitch");
   const pitchRivals = valOrSkip("pitch-rivals");
   const pitchLine = isPitch === "是" ? "是" + (pitchRivals ? "（共同比稿廠商：" + pitchRivals + "）" : "") : isPitch;
@@ -446,6 +521,7 @@ function decodeState(str){
 }
 
 function generateShareLink(){
+  if(!validateForm()) return;
   const state = collectFormState();
   const encoded = encodeState(state);
   const url = window.location.origin + window.location.pathname + "#data=" + encoded;
