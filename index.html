@@ -291,7 +291,15 @@
 
   <div class="btn-row">
     <button class="btn" onclick="generateBrief()">產生 Brief 文字</button>
-    <button class="btn secondary" onclick="window.print()">另存 PDF</button>
+    <button class="btn secondary" onclick="generateShareLink()">產生分享連結</button>
+  </div>
+  <div id="share-area" style="display:none;margin-top:16px;">
+    <div class="section">
+      <h2>分享連結</h2>
+      <div id="share-link-output" style="font-family:'Courier New',monospace;font-size:12px;word-break:break-all;border:2px dashed var(--orange);border-radius:8px;padding:14px;background:#FFFDFB;"></div>
+      <button class="btn copy-btn" id="copyLinkBtn" onclick="copyShareLink()">複製連結</button>
+      <div class="note">把連結傳給策略企劃，對方點開就會自動看到填好的內容。連結本身不會把資料上傳到任何伺服器，資料就編碼在網址裡。</div>
+    </div>
   </div>
 
   <div id="output-area">
@@ -376,6 +384,103 @@ function copyBrief(){
     setTimeout(()=>{ btn.textContent = "複製全部文字"; btn.classList.remove("copied"); }, 2000);
   });
 }
+
+// ===== 分享連結功能 =====
+// 所有欄位 id 清單（text/textarea）與 radio/checkbox 群組名稱
+const TEXT_FIELD_IDS = ["filler","fill-date","client","brand","industry","product","pitchcat-other","pitch-rivals",
+  "background","past-marketing","goal","audience","competitors","media-plan","budget","period","deadline",
+  "client-trait","special","module-other"];
+const RADIO_NAMES = ["reqtype","ispitch","clienttype","clientrel","pitchcat"];
+const CHECK_NAMES = ["modules"];
+
+function collectFormState(){
+  const state = {t:{}, r:{}, c:{}};
+  TEXT_FIELD_IDS.forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) state.t[id] = el.value;
+  });
+  RADIO_NAMES.forEach(name=>{
+    const checked = document.querySelector('input[name="'+name+'"]:checked');
+    if(checked) state.r[name] = checked.value;
+  });
+  CHECK_NAMES.forEach(name=>{
+    const checked = [...document.querySelectorAll('input[name="'+name+'"]:checked')].map(el=>el.value);
+    if(checked.length) state.c[name] = checked;
+  });
+  return state;
+}
+
+function applyFormState(state){
+  if(!state) return;
+  if(state.t){
+    Object.entries(state.t).forEach(([id,val])=>{
+      const el = document.getElementById(id);
+      if(el) el.value = val;
+    });
+  }
+  if(state.r){
+    Object.entries(state.r).forEach(([name,val])=>{
+      const el = document.querySelector('input[name="'+name+'"][value="'+CSS.escape(val)+'"]');
+      if(el) el.checked = true;
+    });
+  }
+  if(state.c){
+    Object.entries(state.c).forEach(([name,vals])=>{
+      vals.forEach(val=>{
+        const el = document.querySelector('input[name="'+name+'"][value="'+CSS.escape(val)+'"]');
+        if(el) el.checked = true;
+      });
+    });
+  }
+}
+
+function encodeState(state){
+  const json = JSON.stringify(state);
+  // UTF-8 安全的 base64 編碼
+  return btoa(encodeURIComponent(json).replace(/%([0-9A-F]{2})/g, (m,p)=>String.fromCharCode('0x'+p)));
+}
+
+function decodeState(str){
+  const json = decodeURIComponent(Array.prototype.map.call(atob(str), c=>'%'+('00'+c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+  return JSON.parse(json);
+}
+
+function generateShareLink(){
+  const state = collectFormState();
+  const encoded = encodeState(state);
+  const url = window.location.origin + window.location.pathname + "#data=" + encoded;
+  document.getElementById("share-link-output").textContent = url;
+  document.getElementById("share-area").style.display = "block";
+  document.getElementById("share-area").scrollIntoView({behavior:"smooth"});
+}
+
+function copyShareLink(){
+  const text = document.getElementById("share-link-output").textContent;
+  navigator.clipboard.writeText(text).then(()=>{
+    const btn = document.getElementById("copyLinkBtn");
+    btn.textContent = "已複製 ✓";
+    btn.classList.add("copied");
+    setTimeout(()=>{ btn.textContent = "複製連結"; btn.classList.remove("copied"); }, 2000);
+  });
+}
+
+// 頁面載入時，若網址帶有分享資料，自動還原並顯示 Brief 文字
+document.addEventListener("DOMContentLoaded", function(){
+  const hash = window.location.hash;
+  if(hash.startsWith("#data=")){
+    try{
+      const state = decodeState(hash.slice(6));
+      applyFormState(state);
+      generateBrief();
+      const banner = document.createElement("div");
+      banner.style.cssText = "background:#FDF1E8;border:2px solid var(--orange);border-radius:8px;padding:14px 18px;margin-bottom:20px;font-size:14px;font-weight:600;color:#C4550F;";
+      banner.textContent = "📋 已載入業務填寫的內容，以下為填單結果";
+      document.querySelector(".wrap").insertBefore(banner, document.querySelector("header").nextSibling);
+    }catch(e){
+      console.error("連結資料解析失敗", e);
+    }
+  }
+});
 </script>
 </body>
 </html>
