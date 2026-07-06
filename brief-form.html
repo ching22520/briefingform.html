@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>提案 Brief 表單</title>
+<style>
+  :root{
+    --orange:#E86A1F;
+    --orange-deep:#C4550F;
+    --ink:#2B2B2B;
+    --grey:#767676;
+    --line:#E3DED8;
+    --bg:#FAF7F3;
+    --card:#FFFFFF;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    line-height:1.7;
+    padding:40px 16px 80px;
+  }
+  .wrap{max-width:760px;margin:0 auto;}
+  header{margin-bottom:36px;border-left:6px solid var(--orange);padding-left:20px;}
+  header h1{font-size:26px;font-weight:700;letter-spacing:1px;}
+  header p{color:var(--grey);font-size:14px;margin-top:6px;}
+  .section{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:26px 28px;
+    margin-bottom:20px;
+  }
+  .section h2{
+    font-size:15px;
+    color:var(--orange-deep);
+    letter-spacing:2px;
+    margin-bottom:18px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .section h2::after{content:"";flex:1;height:1px;background:var(--line);}
+  .field{margin-bottom:18px;}
+  .field:last-child{margin-bottom:0;}
+  label{display:block;font-size:14px;font-weight:600;margin-bottom:6px;}
+  label .opt{color:var(--grey);font-weight:400;font-size:12px;margin-left:6px;}
+  label .hint{display:block;color:var(--grey);font-weight:400;font-size:12px;margin-top:2px;}
+  input[type=text],textarea,select{
+    width:100%;
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:10px 12px;
+    font-size:14px;
+    font-family:inherit;
+    background:#FFFDFB;
+    color:var(--ink);
+  }
+  input[type=text]:focus,textarea:focus,select:focus{
+    outline:none;border-color:var(--orange);
+  }
+  textarea{min-height:72px;resize:vertical;}
+  .radio-row,.check-row{display:flex;flex-wrap:wrap;gap:10px;}
+  .radio-row label,.check-row label{
+    font-weight:400;display:flex;align-items:center;gap:6px;
+    border:1px solid var(--line);border-radius:20px;
+    padding:6px 14px;cursor:pointer;font-size:13px;background:#FFFDFB;
+    margin-bottom:0;
+  }
+  .radio-row input,.check-row input{accent-color:var(--orange);}
+  .radio-row label:has(input:checked),.check-row label:has(input:checked){
+    border-color:var(--orange);background:#FDF1E8;font-weight:600;
+  }
+  .resource-grid{display:grid;grid-template-columns:88px 1fr;gap:8px;align-items:center;}
+  .resource-grid .rname{font-size:13px;font-weight:600;color:var(--ink);}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media (max-width:560px){.two-col{grid-template-columns:1fr;}}
+  .btn{
+    display:block;width:100%;
+    background:var(--orange);color:#fff;
+    border:none;border-radius:8px;
+    font-size:16px;font-weight:700;letter-spacing:2px;
+    padding:15px;cursor:pointer;margin-top:8px;
+    font-family:inherit;
+  }
+  .btn:hover{background:var(--orange-deep);}
+  #output-area{display:none;margin-top:24px;}
+  #brief-output{
+    width:100%;min-height:300px;
+    font-family:"Courier New",monospace;
+    font-size:13px;line-height:1.6;
+    border:2px dashed var(--orange);
+    border-radius:8px;padding:16px;
+    background:#FFFDFB;white-space:pre-wrap;
+  }
+  .copy-btn{background:var(--ink);margin-top:10px;}
+  .copy-btn:hover{background:#000;}
+  .copied{background:#2E7D32 !important;}
+  .note{
+    font-size:12px;color:var(--grey);margin-top:10px;
+    background:#FDF1E8;border-radius:6px;padding:10px 14px;
+  }
+  .btn-row{display:flex;gap:12px;margin-top:8px;}
+  .btn-row .btn{margin-top:0;}
+  .btn.secondary{background:#fff;color:var(--orange-deep);border:2px solid var(--orange);}
+  .btn.secondary:hover{background:#FDF1E8;}
+  @media print{
+    body{background:#fff;padding:0;}
+    .btn,.btn-row,#output-area,.note{display:none !important;}
+    .section{border:1px solid #ccc;box-shadow:none;page-break-inside:avoid;margin-bottom:12px;padding:16px 20px;}
+    header{margin-bottom:20px;}
+    textarea,input[type=text]{border:none;border-bottom:1px solid #ddd;border-radius:0;background:#fff;padding:4px 0;}
+    .radio-row label,.check-row label{border:1px solid #ddd;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>提案 Brief 表單</h1>
+    <p>請盡量填寫，不確定的欄位可留空或寫「待確認」。</p>
+  </header>
+
+  <div class="section">
+    <h2>基本資訊</h2>
+    <div class="two-col">
+      <div class="field">
+        <label>填單人（組別＿姓名）</label>
+        <input type="text" id="filler" placeholder="例如：S10_王小明">
+      </div>
+      <div class="field">
+        <label>填單日期</label>
+        <input type="text" id="fill-date" placeholder="例如：2026/7/6">
+      </div>
+    </div>
+    <div class="field">
+      <label>需求類型 *</label>
+      <div class="radio-row">
+        <label><input type="radio" name="reqtype" value="提案製作">提案製作</label>
+        <label><input type="radio" name="reqtype" value="專案諮詢">專案諮詢</label>
+      </div>
+    </div>
+    <div class="field">
+      <label>是否為比稿 *</label>
+      <div class="radio-row">
+        <label><input type="radio" name="ispitch" value="否">否</label>
+        <label><input type="radio" name="ispitch" value="是">是</label>
+      </div>
+      <input type="text" id="pitch-rivals" placeholder="若為比稿，可填入共同比稿廠商（選填）" style="margin-top:8px;">
+    </div>
+    <div class="two-col">
+      <div class="field">
+        <label>客戶名稱 *</label>
+        <input type="text" id="client" placeholder="例如：統一">
+      </div>
+      <div class="field">
+        <label>品牌 Brand *</label>
+        <input type="text" id="brand" placeholder="例如：統一乳品 AB優酪乳">
+      </div>
+    </div>
+    <div class="two-col">
+      <div class="field">
+        <label>客戶型態 *</label>
+        <div class="radio-row">
+          <label><input type="radio" name="clienttype" value="直客">直客</label>
+          <label><input type="radio" name="clienttype" value="代理商">代理商</label>
+        </div>
+      </div>
+      <div class="field">
+        <label>客戶關係 *</label>
+        <div class="radio-row">
+          <label><input type="radio" name="clientrel" value="新客戶">新客戶</label>
+          <label><input type="radio" name="clientrel" value="既有客戶">既有客戶</label>
+        </div>
+      </div>
+    </div>
+    <div class="field">
+      <label>產業類別 *</label>
+      <input type="text" id="industry" placeholder="例如：食品飲料、美妝、金融">
+    </div>
+    <div class="field">
+      <label>此次宣傳產品／活動 *</label>
+      <input type="text" id="product" placeholder="例如：AB優酪乳 10週年活動；多產品請都列出">
+    </div>
+    <div class="field">
+      <label>提案類型 *</label>
+      <div class="radio-row">
+        <label><input type="radio" name="pitchcat" value="單波Campaign">單波 Campaign</label>
+        <label><input type="radio" name="pitchcat" value="年度提案">年度提案</label>
+        <label><input type="radio" name="pitchcat" value="ROADSHOW">ROADSHOW</label>
+        <label><input type="radio" name="pitchcat" value="其他">其他</label>
+      </div>
+      <input type="text" id="pitchcat-other" placeholder="選「其他」請說明" style="margin-top:8px;">
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>行銷目標與品牌現況</h2>
+    <div class="field">
+      <label>品牌背景／現況／痛點 *
+        <span class="hint">客戶目前遇到什麼狀況？為什麼要做這波行銷？盡量寫客戶的原話</span>
+      </label>
+      <textarea id="background" placeholder="例如：新口味乳飲上市，要維持母品牌領導地位，同時推廣新品並增加好感度與購買意願"></textarea>
+    </div>
+    <div class="field">
+      <label>過往行銷操作 *
+        <span class="hint">客戶之前做過什麼、成效如何、為什麼這次想改變？既有客戶可寫我們過去操作的成果；比稿可寫客戶為什麼想找新夥伴</span>
+      </label>
+      <textarea id="past-marketing"></textarea>
+    </div>
+    <div class="field">
+      <label>行銷目標／媒體任務 *
+        <span class="hint">這波要達成什麼？例如：campaign最大化導流、新品知名度、EC轉換</span>
+      </label>
+      <textarea id="goal"></textarea>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>受眾與競品</h2>
+    <div class="field">
+      <label>目標受眾 TA
+        <span class="hint">有主次之分請分開寫；客戶有指定就寫指定的</span>
+      </label>
+      <textarea id="audience" placeholder="例如：主要TA：6-15歲過敏體質學童的家長／次要TA：20-34歲女性上班族，重視腸胃保健"></textarea>
+    </div>
+    <div class="field">
+      <label>主要競品<span class="opt">選填</span></label>
+      <input type="text" id="competitors" placeholder="例如：光泉、比菲多、養樂多">
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>媒體、預算與時程</h2>
+    <div class="field">
+      <label>預計安排媒體
+        <span class="hint">業務預想的媒體組合，例如：FB、YT、KOL、Search</span>
+      </label>
+      <input type="text" id="media-plan">
+    </div>
+    <div class="field">
+      <label>預算 *</label>
+      <input type="text" id="budget" placeholder="例如：$300萬(net)；未確認請寫量級">
+    </div>
+    <div class="two-col">
+      <div class="field">
+        <label>走期</label>
+        <input type="text" id="period" placeholder="例如：2026.11.1 ~ 12.31">
+      </div>
+      <div class="field">
+        <label>預計向客戶提案日期 *</label>
+        <input type="text" id="deadline" placeholder="例如：2026/10/1">
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>客戶特性與特別需求</h2>
+    <div class="field">
+      <label>客戶特性<span class="opt">選填但很有價值</span>
+        <span class="hint">客戶數位程度高低、偏好、決策者在意什麼。例如：數位程度低，過去都投傳統媒體，喜歡大版位大曝光，重視視覺畫面</span>
+      </label>
+      <textarea id="client-trait"></textarea>
+    </div>
+    <div class="field">
+      <label>特別需求<span class="opt">選填</span>
+        <span class="hint">例如：客戶特別重視受眾輪廓／素材內容／網紅擴散；法規限制；集團規範</span>
+      </label>
+      <textarea id="special"></textarea>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>期望提案內容</h2>
+    <p style="font-size:12px;color:var(--grey);margin-bottom:14px;">勾選這次提案需要涵蓋的內容。勾越多，提案製作時間越長。</p>
+    <div class="check-row">
+      <label><input type="checkbox" name="modules" value="整體市場分析">整體市場分析</label>
+      <label><input type="checkbox" name="modules" value="客戶品牌分析">客戶品牌分析</label>
+      <label><input type="checkbox" name="modules" value="競品分析">競品分析（3個內）</label>
+      <label><input type="checkbox" name="modules" value="受眾分析">受眾分析</label>
+      <label><input type="checkbox" name="modules" value="媒體策略包裝">媒體策略包裝</label>
+      <label><input type="checkbox" name="modules" value="社群經營建議">社群經營建議</label>
+      <label><input type="checkbox" name="modules" value="素材內容建議">素材內容建議</label>
+      <label><input type="checkbox" name="modules" value="網站優化建議">網站優化建議</label>
+    </div>
+    <div class="field" style="margin-top:14px;">
+      <label>其他需求說明<span class="opt">選填</span></label>
+      <input type="text" id="module-other">
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn" onclick="generateBrief()">產生 Brief 文字</button>
+    <button class="btn secondary" onclick="window.print()">另存 PDF</button>
+  </div>
+
+  <div id="output-area">
+    <div class="section">
+      <h2>Brief 產出結果</h2>
+      <div id="brief-output"></div>
+      <button class="btn copy-btn" id="copyBtn" onclick="copyBrief()">複製全部文字</button>
+      <div class="note">複製後貼給策略企劃，或直接貼進 Claude 對話中即可開始提案流程。</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// 填單日期預設為當天（可手動修改）
+document.addEventListener("DOMContentLoaded", function(){
+  const d = new Date();
+  document.getElementById("fill-date").value = d.getFullYear() + "/" + (d.getMonth()+1) + "/" + d.getDate();
+});
+function val(id){ return document.getElementById(id).value.trim() || "（未填）"; }
+function valOrSkip(id){ return document.getElementById(id).value.trim(); }
+function radioVal(name){
+  const r = document.querySelector('input[name="'+name+'"]:checked');
+  return r ? r.value : "（未填）";
+}
+function checkVals(name){
+  const checked = [...document.querySelectorAll('input[name="'+name+'"]:checked')].map(c=>c.value);
+  return checked.length ? checked.join("、") : "（未填）";
+}
+function generateBrief(){
+  const isPitch = radioVal("ispitch");
+  const pitchRivals = valOrSkip("pitch-rivals");
+  const pitchLine = isPitch === "是" ? "是" + (pitchRivals ? "（共同比稿廠商：" + pitchRivals + "）" : "") : isPitch;
+  const catOther = valOrSkip("pitchcat-other");
+  const catLine = radioVal("pitchcat") + (catOther ? "（" + catOther + "）" : "");
+
+  const lines = [
+"【提案BRIEF】（由業務填寫）",
+"",
+"■ 基本資訊",
+"填單人：" + val("filler") + "　填單日期：" + val("fill-date"),
+"需求類型：" + radioVal("reqtype"),
+"是否為比稿：" + pitchLine,
+"客戶：" + val("client") + "（" + radioVal("clienttype") + "／" + radioVal("clientrel") + "）",
+"品牌：" + val("brand"),
+"產業類別：" + val("industry"),
+"此次宣傳產品／活動：" + val("product"),
+"提案類型：" + catLine,
+"",
+"■ 行銷目標與品牌現況",
+"品牌背景／現況／痛點：" + val("background"),
+"過往行銷操作：" + val("past-marketing"),
+"行銷目標／媒體任務：" + val("goal"),
+"",
+"■ 受眾與競品",
+"目標受眾：" + val("audience"),
+"主要競品：" + val("competitors"),
+"",
+"■ 媒體、預算與時程",
+"預計安排媒體：" + val("media-plan"),
+"預算：" + val("budget"),
+"走期：" + val("period"),
+"預計提案日期：" + val("deadline"),
+"",
+"■ 客戶特性與特別需求",
+"客戶特性：" + val("client-trait"),
+"特別需求：" + val("special"),
+"",
+"■ 期望提案內容",
+"需涵蓋：" + checkVals("modules"),
+"其他需求：" + val("module-other")
+  ];
+  document.getElementById("brief-output").textContent = lines.join("\n");
+  document.getElementById("output-area").style.display = "block";
+  document.getElementById("output-area").scrollIntoView({behavior:"smooth"});
+}
+function copyBrief(){
+  const text = document.getElementById("brief-output").textContent;
+  navigator.clipboard.writeText(text).then(()=>{
+    const btn = document.getElementById("copyBtn");
+    btn.textContent = "已複製 ✓";
+    btn.classList.add("copied");
+    setTimeout(()=>{ btn.textContent = "複製全部文字"; btn.classList.remove("copied"); }, 2000);
+  });
+}
+</script>
+</body>
+</html>
