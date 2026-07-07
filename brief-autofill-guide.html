@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brief Autofill 安裝教學</title>
+<style>
+  :root{
+    --orange:#E86A1F;
+    --orange-deep:#C4550F;
+    --ink:#2B2B2B;
+    --grey:#767676;
+    --line:#E3DED8;
+    --bg:#FAF7F3;
+    --card:#FFFFFF;
+    --soft:#FDF1E8;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    line-height:1.7;
+    padding:48px 16px 90px;
+  }
+  .wrap{max-width:720px;margin:0 auto;}
+
+  /* ---- Header ---- */
+  header{margin-bottom:14px;}
+  .eyebrow{
+    display:inline-block;font-size:12px;letter-spacing:3px;font-weight:700;
+    color:var(--orange-deep);background:var(--soft);
+    padding:5px 12px;border-radius:20px;margin-bottom:16px;
+  }
+  header h1{font-size:30px;font-weight:800;letter-spacing:1px;line-height:1.35;}
+  header h1 .u{
+    background:linear-gradient(transparent 62%, #FBD8BE 62%);
+    padding:0 2px;
+  }
+  header .lead{color:var(--grey);font-size:15px;margin-top:12px;}
+
+  .time-badge{
+    display:flex;align-items:center;gap:8px;
+    font-size:13px;color:var(--orange-deep);font-weight:600;
+    margin-top:16px;margin-bottom:36px;
+  }
+  .time-badge svg{width:16px;height:16px;}
+
+  /* ---- Prep box ---- */
+  .prep{
+    background:var(--card);border:1px solid var(--line);border-left:5px solid var(--orange);
+    border-radius:10px;padding:18px 22px;margin-bottom:38px;
+  }
+  .prep h3{font-size:14px;letter-spacing:1px;margin-bottom:8px;color:var(--orange-deep);}
+  .prep p{font-size:13.5px;color:var(--ink);}
+  .prep .file{
+    display:inline-block;font-family:"Courier New",monospace;font-size:13px;
+    background:var(--soft);color:var(--orange-deep);font-weight:700;
+    padding:2px 8px;border-radius:5px;
+  }
+
+  /* ---- Steps ---- */
+  .step{
+    display:grid;grid-template-columns:52px 1fr;gap:20px;
+    position:relative;padding-bottom:34px;
+  }
+  .step:not(:last-child)::before{
+    content:"";position:absolute;left:25px;top:52px;bottom:0;
+    width:2px;background:var(--line);
+  }
+  .num{
+    width:52px;height:52px;border-radius:50%;
+    background:var(--orange);color:#fff;
+    display:flex;align-items:center;justify-content:center;
+    font-size:22px;font-weight:800;z-index:1;
+    box-shadow:0 4px 12px rgba(232,106,31,.28);
+  }
+  .step-body{padding-top:4px;}
+  .step-body h2{font-size:18px;font-weight:700;margin-bottom:8px;}
+  .step-body p{font-size:14.5px;color:#444;margin-bottom:10px;}
+
+  /* screenshot placeholder */
+  .shot{
+    border:2px dashed var(--line);border-radius:10px;
+    background:#fff;padding:0;overflow:hidden;margin-top:6px;
+  }
+  .shot .bar{
+    background:var(--bg);border-bottom:1px solid var(--line);
+    padding:8px 12px;display:flex;align-items:center;gap:6px;
+  }
+  .shot .dot{width:9px;height:9px;border-radius:50%;background:#d9d3cc;}
+  .shot .mock{padding:16px 18px;}
+  .shot-hint{
+    font-size:11.5px;color:var(--grey);text-align:center;
+    padding:8px;background:var(--bg);border-top:1px dashed var(--line);
+  }
+
+  /* fake menu rows */
+  .menu-row{
+    display:flex;align-items:center;gap:10px;
+    padding:9px 12px;border-radius:7px;font-size:13.5px;color:#555;
+  }
+  .menu-row.active{background:var(--soft);color:var(--orange-deep);font-weight:700;}
+  .menu-row .ic{width:16px;height:16px;border-radius:4px;background:#ddd;flex:none;}
+  .menu-row.active .ic{background:var(--orange);}
+
+  /* toggle mock */
+  .toggle-card{
+    display:flex;align-items:center;justify-content:space-between;
+    border:1px solid var(--line);border-radius:8px;padding:12px 14px;background:#fff;
+  }
+  .toggle-card .tinfo{display:flex;flex-direction:column;}
+  .toggle-card .tname{font-weight:700;font-size:13.5px;color:var(--ink);}
+  .toggle-card .tdesc{font-size:11.5px;color:var(--grey);}
+  .switch{
+    width:42px;height:24px;border-radius:20px;background:var(--orange);
+    position:relative;flex:none;
+  }
+  .switch::after{
+    content:"";position:absolute;right:3px;top:3px;
+    width:18px;height:18px;border-radius:50%;background:#fff;
+  }
+
+  .upload-btn{
+    display:inline-flex;align-items:center;gap:8px;
+    background:var(--orange);color:#fff;font-weight:700;font-size:13px;
+    padding:9px 16px;border-radius:7px;
+  }
+  .upload-btn .plus{font-size:16px;line-height:1;}
+
+  /* callout inside step */
+  .callout{
+    background:var(--soft);border-radius:8px;padding:11px 14px;
+    font-size:13px;color:var(--orange-deep);margin-top:12px;
+    display:flex;gap:8px;align-items:flex-start;
+  }
+  .callout b{font-weight:700;}
+  .callout .warn{flex:none;font-size:15px;}
+
+  /* ---- Done / usage ---- */
+  .done{
+    background:linear-gradient(135deg,#E86A1F,#C4550F);
+    border-radius:14px;padding:30px 28px;color:#fff;margin-top:16px;
+  }
+  .done h2{font-size:20px;font-weight:800;margin-bottom:6px;}
+  .done p{font-size:14px;opacity:.95;margin-bottom:18px;}
+  .chat-demo{
+    background:rgba(255,255,255,.14);border-radius:10px;padding:14px 16px;
+    font-size:14px;line-height:1.6;backdrop-filter:blur(2px);
+  }
+  .chat-demo .you{
+    display:inline-block;background:#fff;color:var(--ink);
+    padding:8px 13px;border-radius:14px 14px 14px 4px;font-size:13.5px;
+    margin-bottom:10px;max-width:90%;
+  }
+  .chat-demo .claude{
+    display:block;font-size:13px;opacity:.95;padding-left:2px;
+  }
+  .chat-demo .claude .badge{
+    display:inline-block;background:rgba(255,255,255,.25);
+    border-radius:5px;padding:1px 7px;font-size:11px;font-weight:700;
+    margin-right:6px;
+  }
+
+  /* ---- footer note ---- */
+  .foot{
+    margin-top:34px;border-top:1px solid var(--line);padding-top:22px;
+  }
+  .foot h3{font-size:13px;letter-spacing:1px;color:var(--grey);margin-bottom:12px;}
+  .qa{margin-bottom:14px;}
+  .qa .q{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:3px;}
+  .qa .q::before{content:"Q ";color:var(--orange);}
+  .qa .a{font-size:13.5px;color:#555;}
+
+  @media (max-width:520px){
+    header h1{font-size:24px;}
+    .step{grid-template-columns:42px 1fr;gap:14px;}
+    .num{width:42px;height:42px;font-size:18px;}
+    .step:not(:last-child)::before{left:20px;top:42px;}
+  }
+  @media print{
+    body{background:#fff;padding:0;}
+    .done{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .step:not(:last-child)::before{background:#ccc;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <span class="eyebrow">STRATEGY TOOLKIT　安裝教學</span>
+    <h1>把客戶資料，<br>一鍵變成<span class="u">填好的 Brief</span></h1>
+    <p class="lead">安裝 Brief Autofill 技能後，你只要把跟客戶往來的 email、LINE 對話、官網、文件丟給 Claude，它會自動整理成 Brief 並產出一條連結——策略企劃點開就能直接開工。以下四步，一次裝好永久可用。</p>
+    <div class="time-badge">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+      整個安裝大約 3 分鐘，只需做一次
+    </div>
+  </header>
+
+  <div class="prep">
+    <h3>開始前，先準備兩樣</h3>
+    <p>① 收到我傳給你的檔案 <span class="file">brief-autofill.zip</span>（不用解壓縮，等等直接上傳這個 zip）。<br>
+    ② 使用 <b>Claude 桌機版</b>（Pro / Max 帳號），因為技能要靠「程式碼執行」才能運作。</p>
+  </div>
+
+  <!-- STEP 1 -->
+  <div class="step">
+    <div class="num">1</div>
+    <div class="step-body">
+      <h2>打開設定，進入 Capabilities</h2>
+      <p>在 Claude 桌機版左下角點你的頭像 → <b>Settings（設定）</b>，左側選單點 <b>Capabilities</b>（不是 Customize，也不是 Claude Code——很多人會先找錯地方）。</p>
+      <div class="shot">
+        <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+        <div class="mock">
+          <div class="menu-row"><span class="ic"></span>General</div>
+          <div class="menu-row"><span class="ic"></span>Account</div>
+          <div class="menu-row"><span class="ic"></span>Privacy</div>
+          <div class="menu-row"><span class="ic"></span>Billing</div>
+          <div class="menu-row"><span class="ic"></span>Usage</div>
+          <div class="menu-row active"><span class="ic"></span>Capabilities　←　點這裡</div>
+          <div class="menu-row"><span class="ic"></span>Claude Code</div>
+        </div>
+        <div class="shot-hint">📸 左側選單，Capabilities 在 Usage 下面、Claude Code 上面</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="step">
+    <div class="num">2</div>
+    <div class="step-body">
+      <h2>把「Cloud code execution and file creation」打開</h2>
+      <p>進 Capabilities 頁面後，<b>往下捲</b>會看到一區叫 <b>Code execution and file creation</b>，裡面有個項目叫 <b>Cloud code execution and file creation</b>，說明文字最後寫著 <span class="file">Required for skills</span>——這就是技能能不能動的關鍵開關，把它打開。</p>
+      <div class="shot">
+        <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+        <div class="mock">
+          <div class="toggle-card">
+            <div class="tinfo">
+              <span class="tname">Cloud code execution and file creation</span>
+              <span class="tdesc">Claude can execute code on a server and create and edit docs, spreadsheets, presentations, PDFs, and data reports. <b>Required for skills.</b></span>
+            </div>
+            <div class="switch"></div>
+          </div>
+        </div>
+        <div class="shot-hint">📸 Capabilities 頁面往下捲的位置</div>
+      </div>
+      <div class="callout">
+        <span class="warn">⚠️</span>
+        <span>這一頁上面還有一個很像的選項叫 <b>Artifacts</b>，跟一個叫 <b>AI-powered artifacts</b>——都不是這個。要開的是明確寫著 <b>「Required for skills」</b> 那一項。</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="step">
+    <div class="num">3</div>
+    <div class="step-body">
+      <h2>上傳 brief-autofill.zip</h2>
+      <p>開好上一步的開關後，<b>在同一個 Capabilities 頁面繼續往下捲</b>，會看到 <b>Skills</b> 清單（能看到你之前上傳過的技能，例如 proposal-strategy）。點右上角 <b>「Add」</b> 下拉選單 → 選 <b>「Upload a skill」</b>，把我給你的 <span class="file">brief-autofill.zip</span> 選進去。上傳成功後，清單裡會多一行 <b>brief-autofill</b>。</p>
+      <div class="shot">
+        <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+        <div class="mock" style="padding:0;">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--line);">
+            <span style="font-weight:800;font-size:15px;">Skills</span>
+            <span style="display:flex;gap:8px;">
+              <span style="font-size:12px;color:var(--grey);border:1px solid var(--line);border-radius:6px;padding:5px 10px;">Browse</span>
+              <span style="font-size:12px;color:#fff;background:var(--orange);border-radius:6px;padding:5px 10px;font-weight:700;">Add ▾</span>
+            </span>
+          </div>
+          <div style="padding:10px 16px;">
+            <div style="display:flex;justify-content:space-between;font-size:11.5px;color:var(--grey);padding:4px 2px;">
+              <span>Skill</span><span>Last updated</span>
+            </div>
+            <div class="menu-row" style="justify-content:space-between;"><span>proposal-strategy</span><span style="font-size:12px;color:var(--grey);">7/7/26</span></div>
+            <div class="menu-row" style="justify-content:space-between;"><span>cacafly-proposal-design</span><span style="font-size:12px;color:var(--grey);">7/7/26</span></div>
+            <div class="menu-row active" style="justify-content:space-between;"><span>brief-autofill　←　上傳後會出現在這</span><span style="font-size:12px;">剛剛</span></div>
+          </div>
+        </div>
+        <div class="shot-hint">📸 右上角「Add」下拉裡選「Upload a skill」</div>
+      </div>
+      <div class="callout">
+        <span class="warn">⚠️</span>
+        <span>直接上傳 <b>zip 檔本身</b>，不用先解壓縮。若上傳失敗，多半是檔案被解開了——重新用原始的 zip 再試一次。</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 4 -->
+  <div class="step">
+    <div class="num">4</div>
+    <div class="step-body">
+      <h2>確認詳細頁的開關是藍色</h2>
+      <p>上傳成功後會直接跳進 <b>brief-autofill</b> 的詳細頁，能看到 <b>by You</b> 字樣、完整的技能說明內容。右上角有個開關，<b>是藍色（啟用）就代表裝好了</b>；如果是灰色，點一下打開。</p>
+      <div class="shot">
+        <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+        <div class="mock" style="padding:0;">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--line);">
+            <div>
+              <div style="font-weight:800;font-size:15px;">brief-autofill</div>
+              <div style="font-size:11.5px;color:var(--grey);">by You</div>
+            </div>
+            <span style="width:38px;height:22px;border-radius:20px;background:var(--orange);position:relative;flex:none;display:inline-block;"><span style="position:absolute;right:3px;top:3px;width:16px;height:16px;border-radius:50%;background:#fff;"></span></span>
+          </div>
+          <div style="padding:12px 16px;font-size:12px;color:var(--grey);">業務素材自動填 Brief 表單工具⋯</div>
+        </div>
+        <div class="shot-hint">📸 上傳成功後跳出的詳細頁，右上角開關是藍色</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DONE -->
+  <div class="done">
+    <h2>裝好了！之後這樣用 👇</h2>
+    <p>開一個新對話，把跟客戶往來的資料（email 內容、LINE 對話截圖、官網連結、文件檔）貼上或上傳，然後跟 Claude 說一句：</p>
+    <div class="chat-demo">
+      <span class="you">幫我把這些資料整理成 brief，產生填單連結 🙏</span>
+      <span class="claude"><span class="badge">Claude</span>好的，我先讀完你給的資料 → 整理出各欄位讓你核對 → 確認後給你一條「點開即填好」的連結，轉給策略企劃就能開工。</span>
+    </div>
+    <p style="margin-top:16px;margin-bottom:0;font-size:13px;">💡 Claude 會先列出它抓到的欄位讓你確認，缺的必填欄位也會標出來提醒你補——確認沒問題再產生連結就好。</p>
+  </div>
+
+  <!-- FAQ -->
+  <div class="foot">
+    <h3>常見問題</h3>
+    <div class="qa">
+      <div class="q">上傳後找不到技能有反應？</div>
+      <div class="a">先確認第 2 步的「Cloud code execution and file creation」有開，再確認第 4 步的技能開關是開的。兩個都開了還不行，重開一個新對話再試。</div>
+    </div>
+    <div class="qa">
+      <div class="q">手機版 App 也能用嗎？</div>
+      <div class="a">技能不會跨裝置同步。如果你也想在手機用，要在手機版 App 的設定裡「另外再上傳一次」同一個 zip。</div>
+    </div>
+    <div class="qa">
+      <div class="q">Claude 抓錯或漏抓怎麼辦？</div>
+      <div class="a">直接在對話裡跟它說哪裡要改（例如「預算改成 300 萬量級」「這是比稿案」），它會更新後重新產生連結。</div>
+    </div>
+    <div class="qa">
+      <div class="q">連結會把客戶資料傳到哪裡嗎？</div>
+      <div class="a">不會。資料是編碼在網址本身，不會上傳到任何伺服器。連結給誰、誰才看得到。</div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
