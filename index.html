@@ -233,7 +233,7 @@
   <div class="section">
     <h2>受眾與競品</h2>
     <div class="field">
-      <label>目標受眾 TA
+      <label>目標受眾 TA *
         <span class="hint">有主次之分請分開寫；客戶有指定就寫指定的</span>
       </label>
       <textarea id="audience" placeholder="例如：主要TA：6-15歲過敏體質學童的家長／次要TA：20-34歲女性上班族，重視腸胃保健"></textarea>
@@ -332,7 +332,7 @@ document.addEventListener("DOMContentLoaded", function(){
   document.getElementById("fill-date").value = d.getFullYear() + "/" + (d.getMonth()+1) + "/" + d.getDate();
 });
 // ===== 必填驗證 =====
-const REQUIRED_TEXT_IDS = ["client","brand","industry","product","background","past-marketing","goal","budget","deadline"];
+const REQUIRED_TEXT_IDS = ["client","brand","industry","product","background","past-marketing","audience","goal","budget","deadline"];
 const REQUIRED_RADIO_NAMES = ["reqtype","ispitch","clienttype","clientrel","pitchcat"];
 
 function clearFieldError(container){
