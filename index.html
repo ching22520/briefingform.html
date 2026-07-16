@@ -258,7 +258,7 @@
     </div>
     <div class="two-col">
       <div class="field">
-        <label>走期</label>
+        <label>走期 *</label>
         <input type="text" id="period" placeholder="例如：2026.11.1 ~ 12.31">
       </div>
       <div class="field">
@@ -332,7 +332,7 @@ document.addEventListener("DOMContentLoaded", function(){
   document.getElementById("fill-date").value = d.getFullYear() + "/" + (d.getMonth()+1) + "/" + d.getDate();
 });
 // ===== 必填驗證 =====
-const REQUIRED_TEXT_IDS = ["client","brand","industry","product","background","past-marketing","audience","goal","budget","deadline"];
+const REQUIRED_TEXT_IDS = ["client","brand","industry","product","background","past-marketing","audience","goal","budget","period","deadline"];
 const REQUIRED_RADIO_NAMES = ["reqtype","ispitch","clienttype","clientrel","pitchcat"];
 
 function clearFieldError(container){
